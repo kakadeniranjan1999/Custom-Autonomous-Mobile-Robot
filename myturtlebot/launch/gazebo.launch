@@ -1,0 +1,36 @@
+<launch>
+  <include
+    file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find myturtlebot)/world/my.world"/>
+  </include>
+
+  <param name="robot_description" textfile="$(find myturtlebot)/urdf/TURTLEBOT.urdf" />
+
+  <node
+    name="spawn_model"
+    pkg="gazebo_ros"
+    type="spawn_model"
+    args="-file $(find myturtlebot)/urdf/TURTLEBOT.urdf -urdf -model myturtlebot"
+    output="screen" />
+
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+    <remap from="joint_state" to="/myturtlebot/joint_states" />
+  </node>
+
+
+  <node pkg="tf" type="static_transform_publisher" name="front_ball_to_front_case" args="0 0 0 0 0 0 CASTER_FRONT_CASE CASTER_FRONT_BALL 100" />
+  <node pkg="tf" type="static_transform_publisher" name="back_ball_to_back_case" args="0 0 0 0 0 0 CASTER_BACK_CASE CASTER_BACK_BALL 100" />
+
+
+  <!-- <node pkg="myturtlebot" type="keyboard_control.py" name="teleop_twist_keyboard" /> -->
+<!--   <node pkg="myturtlebot" type="obstacle_avoidance.py" name="obstacle_avoidance" /> -->
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find myturtlebot)/config/demo.rviz" />
+
+  <node pkg="map_server" type="map_server" name="map_server" args="$(find myturtlebot)/maps/final_map.yaml">
+    <param name="frame_id" value="map"/>
+    <param name="use_sim_time" value="true"/>
+  </node>
+
+</launch>
